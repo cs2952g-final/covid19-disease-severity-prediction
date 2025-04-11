@@ -20,7 +20,7 @@ class Model(tf.keras.Model):
         super(Model, self).__init__()
 
         self.batch_size = 64
-        self.num_classes = 2
+        self.num_classes = 4 # mild, severe, critical, no disease
         self.loss_list = [] # Append losses to this list in training so you can visualize loss vs time in main
 
         # TODO: Initialize all hyperparameters
@@ -32,16 +32,21 @@ class Model(tf.keras.Model):
         self.filter1 = tf.Variable(tf.random.truncated_normal([5, 5, 3, 16], 0, stddev=0.1))
         self.filter2 = tf.Variable(tf.random.truncated_normal([5, 5, 16, 20], 0, stddev=0.1))
         self.filter3 = tf.Variable(tf.random.truncated_normal([3, 3, 20, 20], 0, stddev=0.1))
+        self.filter3 = tf.Variable(tf.random.truncated_normal([3, 3, 20, 20], 0, stddev=0.1))
+
         self.fbias1 = tf.Variable(tf.random.truncated_normal([16], 0, stddev=0.1)) 
         self.fbias2 = tf.Variable(tf.random.truncated_normal([20], 0, stddev=0.1)) 
         self.fbias3 = tf.Variable(tf.random.truncated_normal([20], 0, stddev=0.1)) 
+        self.fbias4 = tf.Variable(tf.random.truncated_normal([20], 0, stddev=0.1)) 
+
 
         self.w1 = tf.Variable(tf.random.truncated_normal([80,100], 0, stddev=0.1))
         self.b1 = tf.Variable(tf.random.truncated_normal([100], 0, stddev=0.1)) 
-        self.w2 = tf.Variable(tf.random.truncated_normal([100,10], 0, stddev=0.1))
-        self.b2 = tf.Variable(tf.random.truncated_normal([10], 0, stddev=0.1)) 
-        self.w3 = tf.Variable(tf.random.truncated_normal((10,2), 0, stddev=0.1))
-        self.b3 = tf.Variable(tf.random.truncated_normal((2,), 0, stddev=0.1)) 
+        #self.w2 = tf.Variable(tf.random.truncated_normal([100,10], 0, stddev=0.1))
+        #self.b2 = tf.Variable(tf.random.truncated_normal([10], 0, stddev=0.1)) 
+        #self.w3 = tf.Variable(tf.random.truncated_normal((10,2), 0, stddev=0.1))
+        #self.b3 = tf.Variable(tf.random.truncated_normal((2,), 0, stddev=0.1)) 
+
 
     def batch_normalize(self, inputs):
         mean, variance = tf.nn.moments(inputs, axes=[0, 1, 2], keepdims=False)
@@ -60,43 +65,42 @@ class Model(tf.keras.Model):
         # shape of input = (num_inputs (or batch_size), in_height, in_width, in_channels)
         # shape of filter = (filter_height, filter_width, in_channels, out_channels)
         # shape of strides = (batch_stride, height_stride, width_stride, channels_stride)
-
-        # conv layer 1 
-        l1 = tf.nn.conv2d(inputs, self.filter1, [1, 2, 2, 1], padding="SAME")
+        
+        
+        # apply conv2d to the cell by gene matrix (x3)
+        l1 = tf.nn.conv2d(inputs, self.filter1)       
         l1 = tf.nn.bias_add(l1, self.fbias1)
-        #l1 = self.batch_normalize(l1)
         l1 = tf.nn.relu(l1)
-        l1 = tf.nn.max_pool(l1, 3, 2, padding="SAME")
+        l1 = tf.nn.max_pool(l1, KERNEL SIZE, STRIDE (OPT), padding="SAME")
+
         # conv layer 2
         l2 = tf.nn.conv2d(l1, self.filter2, [1, 2, 2, 1], padding="SAME") #can adjust stride here
         l2 = tf.nn.bias_add(l2, self.fbias2)
-        #l2 = self.batch_normalize(l2)
         l2 = tf.nn.relu(l2)
-        l2 = tf.nn.max_pool(l2, 2, 2, padding="SAME") #can adjust stride here
-        if (is_testing):
-            #my conv
-            l3 = stu_conv2d(l2, self.filter3, [1, 1, 1, 1], padding="SAME")
-        else:
-            l3 = tf.nn.conv2d(l2, self.filter3, [1, 1, 1, 1], padding="SAME")
-        l3 = tf.nn.bias_add(l3, self.fbias3)
-        #l3 = self.batch_normalize(l3)
-        l3 = tf.nn.relu(l3)
+        l2 = tf.nn.max_pool(l2, KERNEL SIZE, STRIDE (OPT), padding="SAME") #can adjust stride here
 
-        #reshape the output to make it compatible with dense layers
-        shape_list = tf.Variable(l3).shape
+        # conv layer 3
+        l3 = tf.nn.conv2d(l2, self.filter3, [1, 2, 2, 1], padding="SAME") #can adjust stride here
+        l3 = tf.nn.bias_add(l3, self.fbias2)
+        l3 = tf.nn.relu(l3)
+        l3 = tf.nn.max_pool(l3, KERNEL SIZE, STRIDE (OPT) padding="SAME") #can adjust stride here
+        
+        # conv layer 4
+        l4 = tf.nn.conv2d(l3, self.filter4, [1, 1, 1, 1], padding="SAME")
+        l4 = tf.nn.bias_add(l4, self.fbias4)
+        l4 = tf.nn.relu(l4)
+
+        #(TBD) reshape the output to make it compatible with dense layers
+        shape_list = tf.Variable(l4).shape
+        # will change if not 3d
         num_elements = shape_list[1]*shape_list[2]*shape_list[3]
-        l3 = tf.reshape(l3, [shape_list[0], num_elements])
+        l4 = tf.reshape(l4, [shape_list[0], num_elements])
 
         #dense layer 1
-        dense1 = tf.matmul(l3,self.w1)+self.b1
+        dense1 = tf.matmul(l4,self.w1)+self.b1
         dense1 = tf.nn.leaky_relu(dense1)
-        #dense layer 2
-        dense2 = tf.matmul(dense1, self.w2)+self.b2
-        dense2 = tf.nn.leaky_relu(dense2)
-        #dense layer 3
-        dense3 = tf.matmul(dense2, self.w3)+self.b3
-
-        return dense3
+        
+        return dense1
 
     def loss(self, logits, labels):
         """
@@ -108,8 +112,8 @@ class Model(tf.keras.Model):
         :param labels: during training, matrix of shape (batch_size, self.num_classes) containing the train labels
         :return: the loss of the model as a Tensor
         """
-        loss = tf.nn.softmax_cross_entropy_with_logits(labels, logits)
-        return tf.reduce_mean(loss)
+        loss = tf.nn.CategoricalCrossentropy(labels, logits)
+        return tf.reduce_mean(loss) # CHECK THIS.
 
 
     def accuracy(self, logits, labels):
@@ -153,6 +157,7 @@ def train(model, train_inputs, train_labels):
 
     for b, b1 in enumerate(range(model.batch_size, train_inputs.shape[0] + 1, model.batch_size)):
         b0 = b1 - model.batch_size
+        # NO MORE RANDOM FLIP LEFT RIGHT!
         input_batch = tf.image.random_flip_left_right(train_inputs[b0:b1])
         label_batch = train_labels[b0:b1]
 
@@ -270,18 +275,10 @@ def visualize_results(image_inputs, probabilities, image_labels, first_label, se
 
 def main():
     '''
-    Read in CIFAR10 data (limited to 2 classes), initialize your model, and train and 
-    test your model for a number of epochs. We recommend that you train for
-    10 epochs and at most 25 epochs.
+    Read in cellxgene matrix!
 
     Consider printing the loss, training accuracy, and testing accuracy after each epoch
     to ensure the model is training correctly.
-    
-    CS1470 students should receive a final accuracy 
-    on the testing examples for cat and dog of >=70%.
-    
-    CS2470 students should receive a final accuracy 
-    on the testing examples for cat and dog of >=75%.
     
     :return: None
     '''

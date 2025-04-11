@@ -29,8 +29,24 @@ def filter_data_freq(annDataObj, min_genes, min_counts):
     '''
     return sc.pp.filter_cells(annDataObj, min_genes, min_counts)
 
+def filter_highly_variable_genes(annDataObj, n_top_genes):
+    '''
+    Selects and subsets to the 'n_top_genes' number of highly variable genes.
+    '''
+    sc.pp.highly_variable_genes(annDataObj, n_top_genes=n_top_genes, subset=True)
+    return annDataObj
+
 def minimize_batch_effects(annDataObj):
    '''
    Outputs a batch-corrected np.array of the corrected data matrix
    '''
    return sc.pp.combat(annDataObj)
+
+def normalize_and_log(annDataObj, target_sum=1e4):
+    '''
+    Normalizes total counts to target_sum and applies log1p transform.
+    '''
+    # there's also an option to exclude very highly expressed genes if we want (unchecked for now)
+    sc.pp.normalize_total(annDataObj, target_sum=target_sum)
+    sc.pp.log1p(annDataObj)
+    return annDataObj

@@ -290,6 +290,7 @@ def main():
     LOCAL_TRAIN_FILE = "/Users/axywu/Desktop/cs1470/homework-3p-cnns-awu917/data/train"
     LOCAL_TEST_FILE = "/Users/axywu/Desktop/cs1470/homework-3p-cnns-awu917/data/test"
 
+    #TO DO: add a get_data method! 
     train_inputs, train_labels = get_data(LOCAL_TRAIN_FILE, 3, 5)
     test_inputs, test_labels = get_data(LOCAL_TEST_FILE, 3, 5)
 

@@ -10,7 +10,7 @@ import scanpy as sc
 sc.settings.set_figure_params(dpi=50, facecolor="white")
 
 # bring in data 
-combat_file = '/Users/hsnell/Downloads/COMBAT_all_20250411.h5ad'
+combat_file = 'data/COMBAT_all_20250411.h5ad'
 adata = sc.read_h5ad(combat_file)
 
 ### full cell x gene matrix 

@@ -6,6 +6,8 @@ import tensorflow as tf
 import numpy as np
 import random
 import math
+from visualization import SaliencyMap
+from preprocessing import *
 
 # ensures that we run only on cpu
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
@@ -291,8 +293,8 @@ def main():
     LOCAL_TEST_FILE = "/Users/axywu/Desktop/cs1470/homework-3p-cnns-awu917/data/test"
 
     #TO DO: add a get_data method! 
-    train_inputs, train_labels = get_data(LOCAL_TRAIN_FILE, 3, 5)
-    test_inputs, test_labels = get_data(LOCAL_TEST_FILE, 3, 5)
+    #train_inputs, train_labels = get_data(LOCAL_TRAIN_FILE, 3, 5)
+    #test_inputs, test_labels = get_data(LOCAL_TEST_FILE, 3, 5)
 
     model = Model()
 
@@ -306,6 +308,12 @@ def main():
     print(f'Testing Accuracy: {test_acc}')
 
     visualize_loss(model.loss_list)
+
+    # saliency maps 
+    SM = SaliencyMap(model)
+    grads = SM.get_gradients(test_inputs) # check input here?
+    norm_grads = SM.norm_grad(grads)
+
 
 
 if __name__ == '__main__':

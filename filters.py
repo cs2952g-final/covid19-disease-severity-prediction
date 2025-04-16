@@ -20,6 +20,7 @@ def filter_data_quality(annDataObj):
     metrics = sc.pp.calculate_qc_metrics(
         adata=annDataObj
     )
+    #RETURN AS ANNDATA OBJECT!!
 
 def filter_data_freq(annDataObj, min_genes, min_counts):
     '''

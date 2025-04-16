@@ -315,6 +315,5 @@ def main():
     norm_grads = SM.norm_grad(grads)
 
 
-
 if __name__ == '__main__':
     main()

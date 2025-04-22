@@ -9,7 +9,7 @@ import math
 from visualization import SaliencyMap
 from preprocessing import *
 
-from preprocessing_skylar import cell_data
+#from preprocessing_skylar import cell_data
 
 # ensures that we run only on cpu
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
@@ -287,24 +287,33 @@ def main():
     :return: None
     '''
     
+    # read in data
+    combat_file = 'data/COMBAT_all_20250411.h5ad'
 
-    model = Model()
+    training_dict, testing_dict, train_label_dict, test_label_dict = get_final_data(combat_file)
 
-    for epoch in range(1, 25):
+    for cell in len(training_dict): 
+        train_inputs = training_dict[cell].X
+        test_inputs = testing_dict[cell].X
+        train_labels = train_label_dict[cell]
+        test_labels = test_label_dict[cell]
 
-        train_acc = train(model, train_inputs, train_labels)
-        print(f'Epoch {epoch}, Training Accuracy: {train_acc}')
+        model = Model()
 
+        for epoch in range(1, 3):
 
-    test_acc = test(model, test_inputs, test_labels)
-    print(f'Testing Accuracy: {test_acc}')
+            train_acc = train(model, train_inputs, train_labels)
+            print(f'Epoch {epoch}, Training Accuracy: {train_acc}')
 
-    visualize_loss(model.loss_list)
+        test_acc = test(model, test_inputs, test_labels)
+        print(f'Testing Accuracy: {test_acc}')
 
-    # saliency maps 
-    SM = SaliencyMap(model)
-    grads = SM.get_gradients(test_inputs) # check input here?
-    norm_grads = SM.norm_grad(grads)
+        visualize_loss(model.loss_list)
+
+        # saliency maps 
+        # SM = SaliencyMap(model)
+        # grads = SM.get_gradients(test_inputs) # check input here?
+        # norm_grads = SM.norm_grad(grads)
 
 
 if __name__ == '__main__':

@@ -9,6 +9,8 @@ import math
 from visualization import SaliencyMap
 from preprocessing import *
 
+from preprocessing_skylar import cell_data
+
 # ensures that we run only on cpu
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
@@ -284,17 +286,7 @@ def main():
     
     :return: None
     '''
-    # TODO: Use the autograder filepaths to get data before submitting to autograder.
-    #       Use the local filepaths when running on your local machine.
-    AUTOGRADER_TRAIN_FILE = '../data/train'
-    AUTOGRADER_TEST_FILE = '../data/test'
-
-    LOCAL_TRAIN_FILE = "/Users/axywu/Desktop/cs1470/homework-3p-cnns-awu917/data/train"
-    LOCAL_TEST_FILE = "/Users/axywu/Desktop/cs1470/homework-3p-cnns-awu917/data/test"
-
-    #TO DO: add a get_data method! 
-    #train_inputs, train_labels = get_data(LOCAL_TRAIN_FILE, 3, 5)
-    #test_inputs, test_labels = get_data(LOCAL_TEST_FILE, 3, 5)
+    
 
     model = Model()
 

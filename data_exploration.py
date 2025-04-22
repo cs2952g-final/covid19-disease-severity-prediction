@@ -4,13 +4,13 @@ import pandas as pd
 import sys 
 import numpy as np
 import anndata as ad
-import pooch
+#import pooch
 import scanpy as sc
 
 sc.settings.set_figure_params(dpi=50, facecolor="white")
 
 # bring in data 
-combat_file = 'data/COMBAT_all_20250411.h5ad'
+combat_file = '/Users/skylarwalters/Desktop/e243d7cd-9693-4396-8bb7-d5716782076b/COMBAT2022.h5ad'
 adata = sc.read_h5ad(combat_file)
 
 ### full cell x gene matrix 
@@ -31,6 +31,7 @@ adata = sc.read_h5ad(combat_file)
 # filter out anything we don't want
 cell_data = adata.obs[(adata.obs['disease'] != 'influenza') & (adata.obs['Smoking'] == 'never or unknown') & (~adata.obs['Source'].isin(["Flu", "Sepsis", "COVID_LDN", "COVID_HCW_MILD"]))]
 
+print(adata.obs_keys())
 # b cells
 b_cell_data = cell_data[(cell_data['cell_type'] == 'B cell')]
 print("b cell counts:")

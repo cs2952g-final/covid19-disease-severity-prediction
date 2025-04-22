@@ -33,16 +33,6 @@ def filter_data(raw_data, min_genes, min_counts, n_top_genes):
     filtered = filtered.obs[(adata.obs['disease'] != 'influenza') & (adata.obs['Smoking'] == 'never or unknown') & (~adata.obs['Source'].isin(["Flu", "Sepsis", "COVID_LDN", "COVID_HCW_MILD"]))]
     return normalize_and_log(filtered)
 
-def get_cell_data(adata, cell_types=['B cell', 'natural killer cell', 'dendritic cell', 'CD4-positive, alpha-beta T cell', 'classical monocyte', 'double-positive, alpha-beta thymocyte', 'hematopoietic stem cell']):
-    '''
-    return a dict mapping from cell type to the cell type's anndata file
-    '''
-    cell_data = {}
-    for cell_type in cell_types:
-        cell_data[cell_type] = adata[(adata['cell_type'] == cell_type)]
-    
-    return cell_data
-
 def severity_cts(adata):
     '''
     Return tuple of (severity, ct) with the lowest amount.
@@ -57,7 +47,36 @@ def severity_cts(adata):
             return_ct = severity_to_qty[elem]
 
     return return_sev, return_ct
+
+def get_cell_data(adata, cell_types=['B cell', 'natural killer cell', 'dendritic cell', 'CD4-positive, alpha-beta T cell', 'classical monocyte', 'double-positive, alpha-beta thymocyte', 'hematopoietic stem cell']):
+    '''
+    Creates cell_data, a dict mapping to adata objects for its corresponding
+    cell type. 
+    '''
+    cell_data = {}
     
-# generic inputs to preproc: cell type(s), f/e severity --> 
-# get covid severe data 
-#then concat...?
+    # iterate through cell types
+    for cell_type in cell_types:
+        # 1. create data object for the cell type
+        cell_data[cell_type] = adata[(adata['cell_type'] == cell_type)]
+        # 2. get severity and number of samples from new adata subset
+        _, n_samples = severity_cts(cell_data[cell_type])
+        
+        # 3. subsample based on minimum count
+        balanced = []
+        for severity in ['COVID_CRIT', 'COVID_MILD', 'COVID_SEV', 'HV']:
+            # get subset of length n_samples that contains the given severity
+            mask = cell_data[cell_type].obs['Source'].isin(severity)
+            subset = cell_data[cell_type][mask]
+            
+            balanced.append(subset[:n_samples] if len(subset) > n_samples else subset)
+        
+        # insert to cell data matrix!
+        cell_data[cell_type] = ad.concat(balanced)
+    return cell_data
+
+# run!
+filtered_data = filter_data(adata, min_genes, min_counts, n_top_genes)
+cell_data = get_cell_data(filtered_data)
+# to access cell matrix: cell_data[cell type].X
+

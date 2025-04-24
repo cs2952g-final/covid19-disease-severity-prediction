@@ -147,6 +147,10 @@ def get_data(combat_file, min_counts, n_top_genes):
 
     print("Retrieving cell data")
     testing, training,  = get_cell_data(filtered_data)
+
+    training.write('training_data')
+    testing.write('testing_data')
+    
     return testing, training
 
 

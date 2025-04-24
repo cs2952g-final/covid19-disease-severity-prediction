@@ -8,6 +8,8 @@ import random
 import math
 from visualization import SaliencyMap
 from preprocessing import get_data
+import sys
+import scanpy as sc
 
 #from preprocessing_skylar import cell_data
 
@@ -75,19 +77,19 @@ class Model(tf.keras.Model):
         l1 = tf.nn.conv2d(inputs, self.filter1)       
         l1 = tf.nn.bias_add(l1, self.fbias1)
         l1 = tf.nn.relu(l1)
-        l1 = tf.nn.max_pool(l1, KERNEL SIZE, STRIDE (OPT), padding="SAME")
+        #l1 = tf.nn.max_pool(l1, KERNEL SIZE, STRIDE (OPT), padding="SAME")
 
         # conv layer 2
         l2 = tf.nn.conv2d(l1, self.filter2, [1, 2, 2, 1], padding="SAME") #can adjust stride here
         l2 = tf.nn.bias_add(l2, self.fbias2)
         l2 = tf.nn.relu(l2)
-        l2 = tf.nn.max_pool(l2, KERNEL SIZE, STRIDE (OPT), padding="SAME") #can adjust stride here
+        #l2 = tf.nn.max_pool(l2, KERNEL SIZE, STRIDE (OPT), padding="SAME") #can adjust stride here
 
         # conv layer 3
         l3 = tf.nn.conv2d(l2, self.filter3, [1, 2, 2, 1], padding="SAME") #can adjust stride here
         l3 = tf.nn.bias_add(l3, self.fbias2)
         l3 = tf.nn.relu(l3)
-        l3 = tf.nn.max_pool(l3, KERNEL SIZE, STRIDE (OPT) padding="SAME") #can adjust stride here
+        #l3 = tf.nn.max_pool(l3, KERNEL SIZE, STRIDE (OPT) padding="SAME") #can adjust stride here
         
         # conv layer 4
         l4 = tf.nn.conv2d(l3, self.filter4, [1, 1, 1, 1], padding="SAME")
@@ -289,26 +291,38 @@ def main():
     
     # read in data
     combat_file = 'data/COMBAT_all_20250411.h5ad'
+    #cell_type_list = sys.argv[1]
 
-    training_dict, testing_dict, train_label_dict, test_label_dict = get_final_data(combat_file)
+    testing_dict, training_dict = get_data(combat_file, 3, 10)
 
-    for cell in len(training_dict): 
-        train_inputs = training_dict[cell].X
-        test_inputs = testing_dict[cell].X
-        train_labels = train_label_dict[cell]
-        test_labels = test_label_dict[cell]
+    # print(len(testing_dict))
 
-        model = Model()
+    # def get_severity(annDataObj): 
+    #     severity_labels = sc.get.obs_df(annDataObj.obs.Source)
+    #     print(type(severity_labels))
 
-        for epoch in range(1, 3):
+    #     return severity_labels
 
-            train_acc = train(model, train_inputs, train_labels)
-            print(f'Epoch {epoch}, Training Accuracy: {train_acc}')
+    # for cell in cell_type_list: 
+    #     train_inputs = training_dict[cell].X
+    #     test_inputs = testing_dict[cell].X
 
-        test_acc = test(model, test_inputs, test_labels)
-        print(f'Testing Accuracy: {test_acc}')
+        #get_severity(train_inputs)
 
-        visualize_loss(model.loss_list)
+
+
+
+        # model = Model()
+
+        # for epoch in range(1, 3):
+
+        #     train_acc = train(model, train_inputs, train_labels)
+        #     print(f'Epoch {epoch}, Training Accuracy: {train_acc}')
+
+        # test_acc = test(model, test_inputs, test_labels)
+        # print(f'Testing Accuracy: {test_acc}')
+
+        # visualize_loss(model.loss_list)
 
         # saliency maps 
         # SM = SaliencyMap(model)

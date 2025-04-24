@@ -18,11 +18,11 @@ from filters import filter_data_freq, filter_highly_variable_genes, minimize_bat
 #sc.settings.set_figure_params(dpi=50, facecolor="white")
 
 # bring in data 
-combat_file = '/Users/skylarwalters/Desktop/e243d7cd-9693-4396-8bb7-d5716782076b/COMBAT2022.h5ad'
-print(f'Reading file: {combat_file}')
-adata = sc.read_h5ad(combat_file)
-print('File read!')
-print(f'Shape: {adata.shape}\n')
+# combat_file = '/Users/skylarwalters/Desktop/e243d7cd-9693-4396-8bb7-d5716782076b/COMBAT2022.h5ad'
+# print(f'Reading file: {combat_file}')
+# adata = sc.read_h5ad(combat_file)
+# print('File read!')
+# print(f'Shape: {adata.shape}\n')
 
 def filter_data(raw_data, min_counts, n_top_genes):
     '''
@@ -118,12 +118,12 @@ def get_cell_data(adata, cell_types=['B cell', 'natural killer cell', 'dendritic
     return cell_training_data, cell_testing_data
 
 # run!
-print("Starting filter process:")
-filtered_data = filter_data(adata, 6, 10)
+# print("Starting filter process:")
+# filtered_data = filter_data(adata, 6, 10)
 
-print("Retrieving cell data")
-testing, training,  = get_cell_data(filtered_data)
-# to access cell matrix: cell_data[cell type].X
+# print("Retrieving cell data")
+# testing, training,  = get_cell_data(filtered_data)
+# # to access cell matrix: cell_data[cell type].X
 
 
 def get_mats(cell_data):

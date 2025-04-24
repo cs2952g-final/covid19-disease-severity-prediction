@@ -38,7 +38,7 @@ class Model(tf.keras.Model):
         self.filter1 = tf.Variable(tf.random.truncated_normal([5, 5, 3, 16], 0, stddev=0.1))
         self.filter2 = tf.Variable(tf.random.truncated_normal([5, 5, 16, 20], 0, stddev=0.1))
         self.filter3 = tf.Variable(tf.random.truncated_normal([3, 3, 20, 20], 0, stddev=0.1))
-        self.filter3 = tf.Variable(tf.random.truncated_normal([3, 3, 20, 20], 0, stddev=0.1))
+        self.filter4= tf.Variable(tf.random.truncated_normal([3, 3, 20, 20], 0, stddev=0.1))
 
         self.fbias1 = tf.Variable(tf.random.truncated_normal([16], 0, stddev=0.1)) 
         self.fbias2 = tf.Variable(tf.random.truncated_normal([20], 0, stddev=0.1)) 
@@ -71,7 +71,6 @@ class Model(tf.keras.Model):
         # shape of input = (num_inputs (or batch_size), in_height, in_width, in_channels)
         # shape of filter = (filter_height, filter_width, in_channels, out_channels)
         # shape of strides = (batch_stride, height_stride, width_stride, channels_stride)
-        
         
         # apply conv2d to the cell by gene matrix (x3)
         l1 = tf.nn.conv2d(inputs, self.filter1)       
@@ -290,44 +289,51 @@ def main():
     '''
     
     # read in data
-    combat_file = 'data/COMBAT_all_20250411.h5ad'
-    #cell_type_list = sys.argv[1]
+    combat_file = '../COMBAT_all_20250411.h5ad'
+    #cell_type_list = sys.argv[1:]
 
-    testing_dict, training_dict = get_data(combat_file, 3, 10)
+    # if len(cell_type_list) > 1:
+    #     for cell in cell_type_list:
+    testing_dict, training_dict = get_data(combat_file, 3, 1000)
 
     # print(len(testing_dict))
-
     # def get_severity(annDataObj): 
+    #     '''
+    #     Return all severities of an anndata object as a list.
+    #     '''
     #     severity_labels = sc.get.obs_df(annDataObj.obs.Source)
     #     print(type(severity_labels))
 
-    #     return severity_labels
+    #     severity_dict = {
+    #         'HV':0,
+    #         'COVID_MILD':1,
+    #         'COVID_SEV':2, 
+    #         'COVID_CRIT':3, 
+    #     }
 
-    # for cell in cell_type_list: 
-    #     train_inputs = training_dict[cell].X
-    #     test_inputs = testing_dict[cell].X
+    #     return [severity_dict[severity_label] for severity_label in severity_labels] ### make np array
 
-        #get_severity(train_inputs)
+    # model = Model()
 
+    # model.train()
+    # train_inputs = training_dict[cell].X
+    # test_inputs = testing_dict[cell].X
 
+    # get_severity(train_inputs)
 
+    # for epoch in range(1, 3):
+    #     train_acc = train(model, train_inputs, train_labels)
+    #     print(f'Epoch {epoch}, Training Accuracy: {train_acc}')
 
-        # model = Model()
+    # test_acc = test(model, test_inputs, test_labels)
+    # print(f'Testing Accuracy: {test_acc}')
 
-        # for epoch in range(1, 3):
+    # visualize_loss(model.loss_list)
 
-        #     train_acc = train(model, train_inputs, train_labels)
-        #     print(f'Epoch {epoch}, Training Accuracy: {train_acc}')
-
-        # test_acc = test(model, test_inputs, test_labels)
-        # print(f'Testing Accuracy: {test_acc}')
-
-        # visualize_loss(model.loss_list)
-
-        # saliency maps 
-        # SM = SaliencyMap(model)
-        # grads = SM.get_gradients(test_inputs) # check input here?
-        # norm_grads = SM.norm_grad(grads)
+    # saliency maps 
+    # SM = SaliencyMap(model)
+    # grads = SM.get_gradients(test_inputs) # check input here?
+    # norm_grads = SM.norm_grad(grads)
 
 
 if __name__ == '__main__':

@@ -1,4 +1,3 @@
-
 # function to get counts per covid severity group
 #reads lower count --> samples other groups based on smallest severity group. 
 
@@ -143,15 +142,13 @@ def get_data(combat_file, min_counts, n_top_genes):
     print(f'Shape: {adata.shape}\n')
 
     print("Starting filter process:")
-    filtered_data = filter_data(adata, 6, 10)
+    filtered_data = filter_data(adata, 6, 1000)
 
     print("Retrieving cell data")
     testing, training,  = get_cell_data(filtered_data)
 
-    training.write('training_data')
-    testing.write('testing_data')
+    for cell_type in training:
+        training[cell_type].write(f'training/{cell_type}_training')
+        testing[cell_type].write(f'testing/{cell_type}_testing')
     
     return testing, training
-
-
-

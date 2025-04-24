@@ -91,9 +91,25 @@ def get_cell_data(adata, cell_types=['B cell', 'natural killer cell', 'dendritic
         
         # split test and train for balanced data
         cutoff = int(len(balanced) * 0.8)
-        cell_training_data[cell_type] = balanced.chunk_X(select=cutoff, replace=False)
+
+        # get indices from balanced to use. 
+        indices = np.random.permutation(balanced.n_obs)
+
+        train_indices = indices[:cutoff]
+        test_indices = indices[cutoff:]
+
+        # susbset
+        train_obs_names = balanced.obs_names[train_indices]
+        test_obs_names = balanced.obs_names[test_indices]
+
+        # add to training and testing subsets
+        cell_training_data[cell_type] = balanced[train_obs_names].copy()
+        cell_testing_data[cell_type] = balanced[test_obs_names].copy()
+
+
+        #cell_training_data[cell_type] = balanced.chunk_X(select=cutoff, replace=False)
         #cell_training_data[cell_type] = random.sample(balanced, cutoff)
-        cell_testing_data[cell_type] = ad.concat([balanced, cell_training_data[cell_type]]).drop_duplicates(keep=False)
+        #cell_testing_data[cell_type] = ad.concat([balanced, cell_training_data[cell_type]]).drop_duplicates(keep=False)
 
         # CHECK CELL TESTING DATA.
         print(f'Verfication: \nTraining type:{type(cell_training_data[cell_type])} \nTesting type:{type(cell_testing_data[cell_type])}')
@@ -106,10 +122,9 @@ print("Starting filter process:")
 filtered_data = filter_data(adata, 6, 10)
 
 print("Retrieving cell data")
-cell_data = get_cell_data(filtered_data)
+testing, training,  = get_cell_data(filtered_data)
 # to access cell matrix: cell_data[cell type].X
 
-print(cell_data['B cell'].X)
 
 def get_mats(cell_data):
     '''
@@ -120,4 +135,19 @@ def get_mats(cell_data):
         cell_by_gene.update({cell_type : cell_data[cell_type].X})
     
     return cell_by_gene
+
+def get_data(combat_file, min_counts, n_top_genes):
+    print(f'Reading file: {combat_file}')
+    adata = sc.read_h5ad(combat_file)
+    print('File read!')
+    print(f'Shape: {adata.shape}\n')
+
+    print("Starting filter process:")
+    filtered_data = filter_data(adata, 6, 10)
+
+    print("Retrieving cell data")
+    testing, training,  = get_cell_data(filtered_data)
+    return testing, training
+
+
 

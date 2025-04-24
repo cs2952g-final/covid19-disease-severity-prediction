@@ -7,7 +7,7 @@ import numpy as np
 import random
 import math
 from visualization import SaliencyMap
-from preprocessing import *
+from preprocessing import get_data
 
 #from preprocessing_skylar import cell_data
 

@@ -29,13 +29,14 @@ adata = sc.read_h5ad(combat_file)
 ### get per-cell-type patient case counts for balancing purposes
 
 # filter out anything we don't want
-cell_data = adata.obs[(adata.obs['disease'] != 'influenza') & (adata.obs['Smoking'] == 'never or unknown') & (~adata.obs['Source'].isin(["Flu", "Sepsis", "COVID_LDN", "COVID_HCW_MILD"]))]
+#cell_data = adata.obs[(adata.obs['disease'] != 'influenza') & (adata.obs['Smoking'] == 'never or unknown') & (~adata.obs['Source'].isin(["Flu", "Sepsis", "COVID_LDN", "COVID_HCW_MILD"]))]
+cell_data = adata[(adata.obs.disease != 'influenza')]
 
-print(adata.obs_keys())
+print(cell_data.obs_keys())
 # b cells
-b_cell_data = cell_data[(cell_data['cell_type'] == 'B cell')]
+b_cell_data = cell_data[(cell_data.obs.cell_type == 'B cell')]
 print("b cell counts:")
-print(b_cell_data['Source'].value_counts())
+print(b_cell_data.obs.Source.value_counts())
 print("\n")
 
 # NKC

@@ -1,0 +1,18 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 11174645
+##  Job Name : run_proj
+##  Nodelist : node1609
+##      CPUs : 1
+##  Mem/Node : 51200 MB
+## Directory : /oscar/scratch/hsnell/covid19-disease-severity-prediction
+##   Job Started : Sat Apr 26 01:05:36 PM EDT 2025
+###############################################################################
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1745687138.361181 1538917 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1745687138.365833 1538917 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+W0000 00:00:1745687138.380324 1538917 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1745687138.380344 1538917 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1745687138.380346 1538917 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1745687138.380348 1538917 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+2025-04-26 13:05:45.369641: F ./tensorflow/core/util/tensor_format.h:428] Check failed: index >= 0 && index < num_total_dims Invalid index from the dimension: 3, 0, C
+/var/spool/slurmd/job11174645/slurm_script: line 16: 1538917 Aborted                 (core dumped) python cnn_hannah.py

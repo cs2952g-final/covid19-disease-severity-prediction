@@ -1,0 +1,115 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 11150578
+##  Job Name : run_proj
+##  Nodelist : node1609
+##      CPUs : 1
+##  Mem/Node : 51200 MB
+## Directory : /oscar/scratch/hsnell/covid19-disease-severity-prediction
+##   Job Started : Thu Apr 24 03:52:06 PM EDT 2025
+###############################################################################
+2025-04-24 15:52:07.684686: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-04-24 15:52:07.685351: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
+2025-04-24 15:52:07.688793: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
+2025-04-24 15:52:07.698176: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:467] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1745524327.713701 1163343 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1745524327.718250 1163343 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+W0000 00:00:1745524327.733516 1163343 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1745524327.733535 1163343 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1745524327.733537 1163343 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1745524327.733539 1163343 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+2025-04-24 15:52:07.737348: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Reading file: ../COMBAT_all_20250411.h5ad
+File read!
+Shape: (836148, 37298)
+
+Starting filter process:
+Verification of filtered keys:
+['GEX_region', 'cluster', 'cluster_source', 'minor_subset', 'minor_subset_source', 'major_subset', 'major_subset_source', 'cell_type_source', 'scRNASeq_sample_ID', 'QC_ngenes', 'QC_total_UMI', 'QC_pct_mitochondrial', 'QC_scrub_doublet_scores', 'TCR_clone_count', 'TCR_clone_proportion', 'BCR_total_mut_HC', 'BCR_clonal_abundance_HC', 'BCR_total_mut_LC', 'assay_ontology_term_id', 'disease_ontology_term_id', 'tissue_ontology_term_id', 'cell_type_ontology_term_id', 'cell_type_original', 'donor_id', 'Source', 'Age', 'BMI', 'Hospitalstay', 'Death28', 'Institute', 'PreExistingHeartDisease', 'PreExistingLungDisease', 'PreExistingKidneyDisease', 'PreExistingDiabetes', 'PreExistingHypertension', 'PreExistingImmunocompromised', 'Smoking', 'Symptomatic', 'Requiredvasoactive', 'SARSCoV2PCR', 'Outcome', 'TimeSinceOnset', 'sex_ontology_term_id', 'development_stage_ontology_term_id', 'self_reported_ethnicity_ontology_term_id', 'organism_ontology_term_id', 'suspension_type', 'tissue_type', 'is_primary_data', 'cell_type', 'assay', 'disease', 'organism', 'sex', 'tissue', 'self_reported_ethnicity', 'development_stage', 'observation_joinid', 'n_counts']
+Data filtering complete
+Retrieving cell data
+Processing B cell
+Minimum severity count found: HV, 2335
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Verfication: 
+Training type:<class 'anndata._core.anndata.AnnData'> 
+Testing type:<class 'anndata._core.anndata.AnnData'>
+B cell balanced. 
+Training shape: (7472, 1000) 
+Testing shape: (1868, 1000)
+Processing natural killer cell
+Minimum severity count found: COVID_CRIT, 3938
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Verfication: 
+Training type:<class 'anndata._core.anndata.AnnData'> 
+Testing type:<class 'anndata._core.anndata.AnnData'>
+natural killer cell balanced. 
+Training shape: (12601, 1000) 
+Testing shape: (3151, 1000)
+Processing dendritic cell
+Minimum severity count found: COVID_CRIT, 326
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Verfication: 
+Training type:<class 'anndata._core.anndata.AnnData'> 
+Testing type:<class 'anndata._core.anndata.AnnData'>
+dendritic cell balanced. 
+Training shape: (1043, 1000) 
+Testing shape: (261, 1000)
+Processing CD4-positive, alpha-beta T cell
+Minimum severity count found: HV, 19117
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Verfication: 
+Training type:<class 'anndata._core.anndata.AnnData'> 
+Testing type:<class 'anndata._core.anndata.AnnData'>
+CD4-positive, alpha-beta T cell balanced. 
+Training shape: (61174, 1000) 
+Testing shape: (15294, 1000)
+Processing classical monocyte
+Minimum severity count found: HV, 10578
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Verfication: 
+Training type:<class 'anndata._core.anndata.AnnData'> 
+Testing type:<class 'anndata._core.anndata.AnnData'>
+classical monocyte balanced. 
+Training shape: (33849, 1000) 
+Testing shape: (8463, 1000)
+Processing double-positive, alpha-beta thymocyte
+Minimum severity count found: HV, 594
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Verfication: 
+Training type:<class 'anndata._core.anndata.AnnData'> 
+Testing type:<class 'anndata._core.anndata.AnnData'>
+double-positive, alpha-beta thymocyte balanced. 
+Training shape: (1900, 1000) 
+Testing shape: (476, 1000)
+Processing hematopoietic stem cell
+Minimum severity count found: HV, 65
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Balanced anndata check: <class 'anndata._core.anndata.AnnData'>
+Verfication: 
+Training type:<class 'anndata._core.anndata.AnnData'> 
+Testing type:<class 'anndata._core.anndata.AnnData'>
+hematopoietic stem cell balanced. 
+Training shape: (208, 1000) 
+Testing shape: (52, 1000)

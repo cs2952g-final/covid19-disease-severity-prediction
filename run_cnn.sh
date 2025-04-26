@@ -10,4 +10,7 @@
 
 # bash file to run proj commands 
 
-python cnn.py 
+module load python
+source ~/venv/dl_in_genomics_finalproj/bin/activate
+
+python cnn_hannah.py 

@@ -5,6 +5,7 @@ import logging, os
 logging.disable(logging.WARNING)
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 import tensorflow as tf
+from tensorflow.keras import layers, models
 import numpy as np
 import random
 import math
@@ -61,51 +62,62 @@ class Model(tf.keras.Model):
 
     def call(self, inputs, is_testing):
         """
-        Runs a forward pass on an input batch of images.
-        
-        :param inputs: images, shape of (num_inputs, 32, 32, 3); during training, the shape is (batch_size, 32, 32, 3)
-        :param is_testing: a boolean that should be set to True only when you're doing Part 2 of the assignment and this function is being called during testing
-        :return: logits - a matrix of shape (num_inputs, num_classes); during training, it would be (batch_size, 2)
+        Runs a forward pass on an input batch of cell x gene matrices.
         """
-        # Remember that
-        # shape of input = (num_inputs (or batch_size), in_height, in_width, in_channels)
-        # shape of filter = (filter_height, filter_width, in_channels, out_channels)
-        # shape of strides = (batch_stride, height_stride, width_stride, channels_stride)
+
+        num_classes = inputs.shape[1]
         
-        # apply conv2d to the cell by gene matrix (x3)
-        l1 = tf.nn.conv2d(inputs, self.filter1, strides = [1, 1, 1, 1], padding="SAME")       
-        l1 = tf.nn.bias_add(l1, self.fbias1)
-        l1 = tf.nn.relu(l1)
-        l1 = tf.nn.max_pool(l1, ksize = 3, strides = [1, 1, 1, 1], padding="SAME")
-
-        # conv layer 2
-        l2 = tf.nn.conv2d(l1, self.filter2, strides = [1, 1, 1, 1], padding="SAME") #can adjust stride here
-        l2 = tf.nn.bias_add(l2, self.fbias2)
-        l2 = tf.nn.relu(l2)
-        l2 = tf.nn.max_pool(l2, ksize = 3, strides = [1, 1, 1, 1], padding="SAME") #can adjust stride here
-
-        # conv layer 3
-        l3 = tf.nn.conv2d(l2, self.filter3, strides = [1, 1, 1, 1], padding="SAME") #can adjust stride here
-        l3 = tf.nn.bias_add(l3, self.fbias2)
-        l3 = tf.nn.relu(l3)
-        l3 = tf.nn.max_pool(l3, ksize = 3, strides = [1, 1, 1, 1], padding="SAME") #can adjust stride here
+        l1 = tf.keras.layers.Conv2D(32, (3, 3), activation='relu', padding='same')(inputs)
+        l1 = tf.keras.layers.MaxPooling2D(pool_size=(2, 2))(l1)
         
-        # conv layer 4
-        l4 = tf.nn.conv2d(l3, self.filter4, strides = [1, 1, 1, 1], padding="SAME")
-        l4 = tf.nn.bias_add(l4, self.fbias4)
-        l4 = tf.nn.relu(l4)
+        l2 = tf.keras.layers.Conv2D(64, (3, 3), activation='relu', padding='same')(l1)
+        l2 = tf.keras.layers.MaxPooling2D(pool_size=(2, 2))(l2)
 
-        #(TBD) reshape the output to make it compatible with dense layers
-        shape_list = tf.Variable(l4).shape
-        # will change if not 3d
-        num_elements = shape_list[1]*shape_list[2]*shape_list[3]
-        l4 = tf.reshape(l4, [shape_list[0], num_elements])
-
-        #dense layer 1
-        dense1 = tf.matmul(l4,self.w1)+self.b1
-        dense1 = tf.nn.leaky_relu(dense1)
+        l3 = tf.keras.layers.Conv2D(128, (3, 3), activation='relu', padding='same')(l2)
+        l3 = tf.keras.layers.MaxPooling2D(pool_size=(2, 2))(l3)
         
-        return dense1
+        l4 = tf.keras.layers.Flatten()(l3)
+        l4 = tf.keras.layers.Dense(256, activation='relu')(l4)
+        l4 = tf.keras.layers.Dropout(0.5)(l4)
+        l4 = tf.keras.layers.Dense(128, activation='relu')(l4)
+        l4 = tf.keras.layers.Dropout(0.5)(l4)
+
+        outputs = tf.keras.layers.Dense(num_classes, activation='softmax')(l4)
+        
+        # # apply conv2d to the cell by gene matrix (x3)
+        # l1 = tf.nn.conv2d(inputs, self.filter1, strides = [1, 1, 1, 1], padding="SAME")       
+        # l1 = tf.nn.bias_add(l1, self.fbias1)
+        # l1 = tf.nn.relu(l1)
+        # l1 = tf.nn.max_pool(l1, ksize = 3, strides = [1, 1, 1, 1], padding="SAME")
+
+        # # conv layer 2
+        # l2 = tf.nn.conv2d(l1, self.filter2, strides = [1, 1, 1, 1], padding="SAME") #can adjust stride here
+        # l2 = tf.nn.bias_add(l2, self.fbias2)
+        # l2 = tf.nn.relu(l2)
+        # l2 = tf.nn.max_pool(l2, ksize = 3, strides = [1, 1, 1, 1], padding="SAME") #can adjust stride here
+
+        # # conv layer 3
+        # l3 = tf.nn.conv2d(l2, self.filter3, strides = [1, 1, 1, 1], padding="SAME") #can adjust stride here
+        # l3 = tf.nn.bias_add(l3, self.fbias2)
+        # l3 = tf.nn.relu(l3)
+        # l3 = tf.nn.max_pool(l3, ksize = 3, strides = [1, 1, 1, 1], padding="SAME") #can adjust stride here
+        
+        # # conv layer 4
+        # l4 = tf.nn.conv2d(l3, self.filter4, strides = [1, 1, 1, 1], padding="SAME")
+        # l4 = tf.nn.bias_add(l4, self.fbias4)
+        # l4 = tf.nn.relu(l4)
+
+        # #(TBD) reshape the output to make it compatible with dense layers
+        # shape_list = tf.Variable(l4).shape
+        # # will change if not 3d
+        # num_elements = shape_list[1]*shape_list[2]*shape_list[3]
+        # l4 = tf.reshape(l4, [shape_list[0], num_elements])
+
+        # #dense layer 1
+        # dense1 = tf.matmul(l4,self.w1)+self.b1
+        # dense1 = tf.nn.leaky_relu(dense1)
+        
+        return outputs
 
     def loss(self, logits, labels):
         """
@@ -117,8 +129,8 @@ class Model(tf.keras.Model):
         :param labels: during training, matrix of shape (batch_size, self.num_classes) containing the train labels
         :return: the loss of the model as a Tensor
         """
-        loss = tf.nn.CategoricalCrossentropy(labels, logits)
-        return tf.reduce_mean(loss) # CHECK THIS.
+        loss = tf.keras.losses.CategoricalCrossentropy()
+        return loss
 
     def accuracy(self, logits, labels):
         """
@@ -159,16 +171,21 @@ def train(model, train_inputs, train_labels):
     #total_loss = 0
     total_acc = 0
 
+    loss_fcn = tf.keras.losses.SparseCategoricalCrossentropy()
+
     for b, b1 in enumerate(range(model.batch_size, train_inputs.shape[0] + 1, model.batch_size)):
         b0 = b1 - model.batch_size
-        input_batch = train_inputs[b0:b1]
-        label_batch = train_labels[b0:b1]
 
-        print(input_batch.shape)
+        input_batch = tf.keras.layers.Input(shape=train_inputs.shape, batch_size=model.batch_size)
+        label_batch = tf.keras.layers.Input(shape=train_labels.shape, batch_size=model.batch_size)
+        #input_batch = train_inputs[b0:b1]
+        #label_batch = train_labels[b0:b1]
 
+        
         with tf.GradientTape() as tape:
-            pred = model.call(input_batch, is_testing=False)
-            loss = model.loss(pred, label_batch)
+            pred = model(input_batch, is_testing=False)
+            label_batch = tf.cast(label_batch, tf.float32)
+            loss = loss_fcn(label_batch, pred)
 
         grads = tape.gradient(loss, model.trainable_variables)
         model.optimizer.apply_gradients(zip(grads, model.trainable_variables))

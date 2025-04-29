@@ -176,21 +176,22 @@ def train(model, train_inputs, train_labels):
     for b, b1 in enumerate(range(model.batch_size, train_inputs.shape[0] + 1, model.batch_size)):
         b0 = b1 - model.batch_size
 
-        input_batch = tf.keras.layers.Input(shape=train_inputs.shape, batch_size=model.batch_size)
-        label_batch = tf.keras.layers.Input(shape=train_labels.shape, batch_size=model.batch_size)
-        #input_batch = train_inputs[b0:b1]
-        #label_batch = train_labels[b0:b1]
+        #input_batch = tf.keras.layers.Input(shape=train_inputs.shape, batch_size=model.batch_size)
+        #label_batch = tf.keras.layers.Input(shape=train_labels.shape, batch_size=model.batch_size)
+        batch_dim = train_inputs[b0:b1][0]
+        train_inputs_newdim = tf.reshape(train_inputs, [batch_dim, train_inputs.shape[0], train_inputs.shape[1], train_inputs.shape[2]])
 
-        
+        label_inputs_newdim = tf.reshape(train_inputs, [batch_dim, train_labels.shape[0], train_labels.shape[1], train_labels.shape[2]])
+
         with tf.GradientTape() as tape:
-            pred = model(input_batch, is_testing=False)
-            label_batch = tf.cast(label_batch, tf.float32)
-            loss = loss_fcn(label_batch, pred)
+            pred = model(train_inputs_newdim, is_testing=False)
+            #label_batch = tf.cast(label_batch, tf.float32)
+            loss = loss_fcn(train_inputs_newdim, pred)
 
         grads = tape.gradient(loss, model.trainable_variables)
         model.optimizer.apply_gradients(zip(grads, model.trainable_variables))
 
-        accuracy = model.accuracy(pred, label_batch)
+        accuracy = model.accuracy(pred, label_inputs_newdim)
         #total_loss += loss
         model.loss_list.append(loss)
         total_acc += accuracy

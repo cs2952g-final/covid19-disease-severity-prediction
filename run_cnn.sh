@@ -13,4 +13,4 @@
 module load python
 source ~/venv/dl_in_genomics_finalproj/bin/activate
 
-python cnn_hannah.py 
+python new_cnn.py 

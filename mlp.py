@@ -3,23 +3,7 @@ from tensorflow import keras
 from tensorflow.keras import layers
 import scanpy as sc
 import numpy as np
-
-
-def get_severity(annDataObj): 
-        '''
-        Return all severities of an anndata object as a list.
-        '''
-        severity_labels = sc.get.obs_df(annDataObj, keys = ["Source"])
-        # print(type(severity_labels))
-
-        severity_dict = {
-            'HV':0,
-            'COVID_MILD':1,
-            'COVID_SEV':2, 
-            'COVID_CRIT':3, 
-        }
-
-        return np.array([severity_dict[severity_label] for severity_label in severity_labels["Source"]]) 
+from new_cnn import get_severity
 
 def main():
     '''
@@ -31,8 +15,13 @@ def main():
     :return: None
     '''
     # read in cell type data
+<<<<<<< HEAD
     init_training = (sc.read_h5ad('training/B cell_training'))
     init_testing = (sc.read_h5ad('testing/B cell_testing'))
+=======
+    init_training = (sc.read_h5ad('training/hematopoietic stem cell_training'))
+    init_testing = (sc.read_h5ad('testing/hematopoietic stem cell_testing'))
+>>>>>>> 877a02376336a2f5cc8fcb649255651df381d6ba
 
     training_labels = get_severity(init_training)
     testing_labels = get_severity(init_testing)
@@ -47,7 +36,9 @@ def main():
     model = keras.Sequential([
         layers.Input(shape=(training_dense.shape[1],)),
         layers.Dense(256, activation='relu'),  
-        layers.Dense(64, activation='relu'),        
+        layers.Dropout(0.5),
+        layers.Dense(64, activation='relu'),     
+        layers.Dropout(0.5),   
         layers.Dense(4, activation='softmax')  
     ])
 

@@ -31,8 +31,8 @@ def main():
     :return: None
     '''
     # read in cell type data
-    init_training = (sc.read_h5ad('training/CD4-positive, alpha-beta T cell_training'))
-    init_testing = (sc.read_h5ad('testing/CD4-positive, alpha-beta T cell_testing'))
+    init_training = (sc.read_h5ad('training/B cell_training'))
+    init_testing = (sc.read_h5ad('testing/B cell_testing'))
 
     training_labels = get_severity(init_training)
     testing_labels = get_severity(init_testing)
@@ -59,7 +59,7 @@ def main():
     
     loss, accuracy = model.evaluate(testing_dense, testing_labels)
     print(f'Testing Accuracy: {accuracy}')
-    print(f'Testing Accuracy: {loss}')
+    print(f'Testing Loss: {loss}')
 
 if __name__ == '__main__':
     main()

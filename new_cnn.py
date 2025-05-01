@@ -11,25 +11,28 @@ def cnn_model(input_shape, num_classes):
     inputs = layers.Input(shape=input_shape)
 
     # Convolutional Block 1
-    x = layers.Conv1D(32, 1, activation='relu', padding='same')(inputs)
+    #x = layers.Conv1D(32, 1, activation='relu', padding='same')(inputs)
+    x = layers.Conv2D(32, (3, 3), activation='relu', padding='same')(inputs)
     x = layers.BatchNormalization()(x)
-    x = layers.MaxPooling1D(pool_size=2)(x)
+    x = layers.MaxPooling2D(pool_size=(2, 2))(x)
 
     # Convolutional Block 2
-    x = layers.Conv1D(64, 1, activation='relu', padding='same')(x)
+    #x = layers.Conv1D(64, 1, activation='relu', padding='same')(x)
+    x = layers.Conv2D(64, (3, 3), activation='relu', padding='same')(inputs)
     x = layers.BatchNormalization()(x)
-    x = layers.MaxPooling1D(pool_size=2)(x)
+    x = layers.MaxPooling2D(pool_size=(2, 2))(x)
 
     # Convolutional Block 3
-    x = layers.Conv1D(128, 1, activation='relu', padding='same')(x)
+    #x = layers.Conv1D(128, 1, activation='relu', padding='same')(x)
+    x = layers.Conv2D(128, (3, 3), activation='relu', padding='same')(inputs)
     x = layers.BatchNormalization()(x)
-    x = layers.MaxPooling1D(pool_size=2)(x)
+    x = layers.MaxPooling2D(pool_size=(2, 2))(x)
 
     # Flatten and Dense layers
     x = layers.Flatten()(x)
-    x = layers.Dense(256, activation='relu')(x)
-    x = layers.Dropout(0.5)(x)
     x = layers.Dense(128, activation='relu')(x)
+    x = layers.Dropout(0.5)(x)
+    x = layers.Dense(64, activation='relu')(x)
     x = layers.Dropout(0.5)(x)
 
     # Output Layer
@@ -69,37 +72,37 @@ def main():
     '''
 
     # set up cell-type data 
-    b_cell_training = (sc.read_h5ad('training/B cell_training'))
-    b_cell_testing = (sc.read_h5ad('testing/B cell_testing'))
+    cell_training = (sc.read_h5ad('training/CD4-positive, alpha-beta T cell_training'))
+    cell_testing = (sc.read_h5ad('testing/CD4-positive, alpha-beta T cell_testing'))
 
-    b_cell_training_labels = get_severity(b_cell_training)
-    b_cell_testing_labels = get_severity(b_cell_testing)
+    cell_training_labels = get_severity(cell_training)
+    cell_testing_labels = get_severity(cell_testing)
 
-    b_cell_training_dense = b_cell_training.X.todense()
-    b_cell_testing_dense = b_cell_testing.X.todense()
+    cell_training_dense = cell_training.X.todense()
+    cell_testing_dense = cell_testing.X.todense()
 
-    b_cell_final_training = tf.expand_dims(b_cell_training_dense, axis=-1)
+    cell_final_training = tf.expand_dims(cell_training_dense, axis=-1)
     #b_cell_final_training_labels = tf.expand_dims(b_cell_training_labels, axis=-1)
 
-    b_cell_final_testing = tf.expand_dims(b_cell_testing_dense, axis=-1)
+    cell_final_testing = tf.expand_dims(cell_testing_dense, axis=-1)
     #b_cell_final_testing_labels = tf.expand_dims(b_cell_testing_labels, axis=-1)
 
     # instantiate model 
     num_classes = 4  # different severity levels (HV, mild, severe, critical)
 
-    input_shape = b_cell_final_training.shape[1:]
+    input_shape = cell_final_training.shape
     print(input_shape)
-    print(b_cell_training_labels.shape)
+    print(cell_training_labels.shape)
     
     model = cnn_model(input_shape, num_classes)
     model.summary()
 
-    # # train model on cell type
-    model.fit(b_cell_final_training, b_cell_training_labels, epochs=20, batch_size=32)
+    # train model on cell type
+    # model.fit(cell_final_training, cell_training_labels, epochs=20, batch_size=32)
 
-    # test model on trained cell type
-    test_loss, test_acc = model.evaluate(b_cell_final_testing, b_cell_testing_labels)
-    print("Test Accuracy:", test_acc)
+    # # test model on trained cell type
+    # test_loss, test_acc = model.evaluate(cell_final_testing, cell_testing_labels)
+    # print("Test Accuracy:", test_acc)
 
     # saliency maps 
     # SM = SaliencyMap(model)

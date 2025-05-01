@@ -2,9 +2,9 @@
 
 #SBATCH -J run_proj     	        # name
 #SBATCH -N 1 						# all cores are on one node
-#SBATCH -n 1                        # cores
-#SBATCH -t 2-00:00 			        # time 5hrs per job days	
-#SBATCH --mem 50G 				    # memory
+#SBATCH -n 12                        # cores
+#SBATCH -t 1:00:00 			        # time 5hrs per job days	
+#SBATCH --mem 150G 				    # memory
 #SBATCH -p bigmem
 
 

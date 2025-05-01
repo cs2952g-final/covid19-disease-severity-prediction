@@ -17,11 +17,7 @@ from filters import filter_data_freq, filter_highly_variable_genes, minimize_bat
 #sc.settings.set_figure_params(dpi=50, facecolor="white")
 
 # bring in data 
-combat_file = 'data/COMBAT2022.h5ad'
-print(f'Reading file: {combat_file}')
-adata = sc.read_h5ad(combat_file)
-print('File read!')
-print(f'Shape: {adata.shape}\n')
+#combat_file = 'data/COMBAT2022.h5ad'
 
 def filter_data(raw_data, min_counts, n_top_genes):
     '''
@@ -34,7 +30,13 @@ def filter_data(raw_data, min_counts, n_top_genes):
     filtered = filtered[(filtered.obs.disease != 'influenza') & (filtered.obs.Smoking == 'never or unknown') & (~filtered.obs.Source.isin(["Flu", "Sepsis", "COVID_LDN", "COVID_HCW_MILD"]))]
     print("Verification of filtered keys:")
     print(filtered.obs_keys())
-    
+
+    minimize_batch_effects(filtered, key='scRNASeq_sample_ID')
+    print("Batch effecets minimized")
+
+    sc.pp.normalize_total(filtered, inplace=True)
+    print("normalized data")
+
     print('Data filtering complete')
     return filtered
     #return normalize_and_log(filtered)
@@ -118,10 +120,10 @@ def get_cell_data(adata, cell_types=['B cell', 'natural killer cell', 'dendritic
 
 # run!
 # print("Starting filter process:")
-filtered_data = filter_data(adata, 6, 10)
+#filtered_data = filter_data(adata, 6, 10)
 
 # print("Retrieving cell data")
-training,testing  = get_cell_data(filtered_data)
+#training,testing  = get_cell_data(filtered_data)
 # # to access cell matrix: cell_data[cell type].X
 
 
@@ -152,3 +154,15 @@ def get_data(combat_file, min_counts, n_top_genes):
         testing[cell_type].write(f'testing/{cell_type}_testing')
     
     return training,testing
+
+def main():
+    combat_file='/Users/skylarwalters/Desktop/data/COMBAT2022.h5ad'
+    print(f'Reading file: {combat_file}')
+    adata = sc.read_h5ad(combat_file)
+    print('File read!')
+    print(f'Shape: {adata.shape}\n')
+
+    get_data(combat_file, 6, 1000)
+
+if __name__ == '__main__':
+    main()

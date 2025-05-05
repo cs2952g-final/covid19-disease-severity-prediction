@@ -4,8 +4,8 @@
 #SBATCH -N 1 						# all cores are on one node
 #SBATCH -n 12                        # cores
 #SBATCH -t 1:00:00 			        # time 5hrs per job days	
-#SBATCH --mem 150G 				    # memory
-#SBATCH -p bigmem
+#SBATCH --mem 50G 				    # memory
+##SBATCH -p bigmem
 
 
 # bash file to run proj commands 

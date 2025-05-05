@@ -3,6 +3,7 @@ from tensorflow.keras import layers, models
 import numpy as np 
 import scanpy as sc
 import anndata as ad
+from visualization import SaliencyMap
 
 def cnn_model(input_shape, num_classes):
     """
@@ -11,25 +12,24 @@ def cnn_model(input_shape, num_classes):
     inputs = layers.Input(shape=input_shape)
 
     # Convolutional Block 1
-    #x = layers.Conv1D(32, 1, activation='relu', padding='same')(inputs)
-    x = layers.Conv2D(32, (3, 3), activation='relu', padding='same')(inputs)
+    x = layers.Conv1D(32, 100, activation='relu', padding='same')(inputs)
     x = layers.BatchNormalization()(x)
-    x = layers.MaxPooling2D(pool_size=(2, 2))(x)
+    x = layers.MaxPooling1D(pool_size=10)(x)
 
     # Convolutional Block 2
-    #x = layers.Conv1D(64, 1, activation='relu', padding='same')(x)
-    x = layers.Conv2D(64, (3, 3), activation='relu', padding='same')(inputs)
+    x = layers.Conv1D(64, 100, activation='relu', padding='same')(x)
     x = layers.BatchNormalization()(x)
-    x = layers.MaxPooling2D(pool_size=(2, 2))(x)
+    x = layers.MaxPooling1D(pool_size=10)(x)
 
     # Convolutional Block 3
-    #x = layers.Conv1D(128, 1, activation='relu', padding='same')(x)
-    x = layers.Conv2D(128, (3, 3), activation='relu', padding='same')(inputs)
+    x = layers.Conv1D(128, 100, activation='relu', padding='same')(x)
     x = layers.BatchNormalization()(x)
-    x = layers.MaxPooling2D(pool_size=(2, 2))(x)
+    x = layers.MaxPooling1D(pool_size=10)(x)
 
     # Flatten and Dense layers
     x = layers.Flatten()(x)
+    x = layers.Dense(256, activation='relu')(x)
+    x = layers.Dropout(0.5)(x)
     x = layers.Dense(128, activation='relu')(x)
     x = layers.Dropout(0.5)(x)
     x = layers.Dense(64, activation='relu')(x)
@@ -72,8 +72,8 @@ def main():
     '''
 
     # set up cell-type data 
-    cell_training = (sc.read_h5ad('training/CD4-positive, alpha-beta T cell_training'))
-    cell_testing = (sc.read_h5ad('testing/CD4-positive, alpha-beta T cell_testing'))
+    cell_training = (sc.read_h5ad('training/B cell_training'))
+    cell_testing = (sc.read_h5ad('testing/B cell_testing'))
 
     cell_training_labels = get_severity(cell_training)
     cell_testing_labels = get_severity(cell_testing)
@@ -90,24 +90,30 @@ def main():
     # instantiate model 
     num_classes = 4  # different severity levels (HV, mild, severe, critical)
 
-    input_shape = cell_final_training.shape
+    input_shape = cell_final_training.shape[1:]
     print(input_shape)
     print(cell_training_labels.shape)
     
     model = cnn_model(input_shape, num_classes)
-    model.summary()
+    #model.summary()
 
     # train model on cell type
-    # model.fit(cell_final_training, cell_training_labels, epochs=20, batch_size=32)
+    model.fit(cell_final_training, cell_training_labels, epochs=1, batch_size=128)
 
-    # # test model on trained cell type
-    # test_loss, test_acc = model.evaluate(cell_final_testing, cell_testing_labels)
-    # print("Test Accuracy:", test_acc)
+    # test model on trained cell type
+    test_loss, test_acc = model.evaluate(cell_final_testing, cell_testing_labels)
+    print("Test Accuracy:", test_acc)
 
     # saliency maps 
-    # SM = SaliencyMap(model)
-    # grads = SM.get_gradients(test_inputs) # check input here?
-    # norm_grads = SM.norm_grad(grads)
+    SM = SaliencyMap(model)
+    grads = SM.get_gradients(cell_final_testing) # check input here?
+    norm_grads = SM.norm_grad(grads)
+    gene_names = list(cell_testing.var_names)
+    top_genes = SM.get_top_genes(norm_grads, gene_names, 10) ## fix this
+
+    print("top genes:")
+    print(top_genes)
+
 
 if __name__ == '__main__':
     main()

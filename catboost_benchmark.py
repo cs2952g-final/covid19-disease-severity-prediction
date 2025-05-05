@@ -1,6 +1,6 @@
 from catboost import CatBoostClassifier, Pool
 from sklearn.metrics import accuracy_score
-from cnn import get_severity
+from new_cnn import get_severity
 import scanpy as sc
 
 def main():
@@ -10,8 +10,8 @@ def main():
     :return: None
     '''
     # read in cell type data
-    init_training = (sc.read_h5ad('training/CD4-positive, alpha-beta T cell_training'))
-    init_testing = (sc.read_h5ad('testing/CD4-positive, alpha-beta T cell_testing'))
+    init_training = (sc.read_h5ad('training/hematopoietic stem cell_training'))
+    init_testing = (sc.read_h5ad('testing/hematopoietic stem cell_testing'))
 
     training_labels = get_severity(init_training)
     testing_labels = get_severity(init_testing)
@@ -23,10 +23,10 @@ def main():
     print(training_dense.shape)
 
     model = CatBoostClassifier(
-        iterations=1000,
-        learning_rate=0.1,
-        depth=6,
-        loss_function='RMSE',
+        iterations=500,
+        learning_rate=0.0005,
+        depth=1,
+        loss_function='MultiClass',
         eval_metric='Accuracy',
         verbose=100,
         random_seed=42
@@ -41,3 +41,7 @@ def main():
 
     accuracy = accuracy_score(testing_labels, preds)
     print(f"Accuracy: {accuracy:.4f}")
+
+
+if __name__ == '__main__':
+    main()

@@ -8,11 +8,6 @@ import tensorflow.keras as keras
 import numpy as np
 import matplotlib.pyplot as plt
 
-# check versions
-#print('tensorflow {}'.format(tf.__version__))
-#print("keras {}".format(keras.__version__))
-
-
 class SaliencyMap():
     def __init__(self, model):
         """Constructs a Vanilla Gradient Map by computing dy/dx.
@@ -72,7 +67,7 @@ class SaliencyMap():
             Gradients of the predictions w.r.t image (same shape as input image)
         """
         abs_grads = np.abs(grad_x)
-        grad_max_ = np.max(abs_grads, axis=3)[0]
+        grad_max_ = np.max(abs_grads, axis=2)[0]
         arr_min, arr_max  = np.min(grad_max_), np.max(grad_max_)
         normalized_grad = (grad_max_ - arr_min) / (arr_max - arr_min + 1e-18)
         normalized_grad = normalized_grad.reshape(1,grad_x.shape[1],grad_x.shape[2],1)
@@ -80,3 +75,20 @@ class SaliencyMap():
         return normalized_grad
 
 
+    def get_top_genes(self, norm_grads, gene_names, num_genes): 
+        
+        # fix mess of list type
+        new_norm_grads = []
+        for n in range(len(norm_grads[0])): 
+            new_grad = float(str(norm_grads[0][n]).replace("[", "").replace("]", ""))
+            new_norm_grads.append(new_grad)
+
+        # get top n gene indices based on highest gradient values (and their indices)
+        top_idx = np.argsort(new_norm_grads)[-num_genes:]
+        top_values = [new_norm_grads[i] for i in top_idx]
+       
+        # use those indices to get gene names form gene name list
+        top_genes = [gene_names[idx] for idx in top_idx]
+
+        return top_genes
+        

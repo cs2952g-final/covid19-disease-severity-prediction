@@ -15,13 +15,9 @@ def main():
     :return: None
     '''
     # read in cell type data
-<<<<<<< HEAD
-    init_training = (sc.read_h5ad('training/B cell_training'))
-    init_testing = (sc.read_h5ad('testing/B cell_testing'))
-=======
+
     init_training = (sc.read_h5ad('training/hematopoietic stem cell_training'))
     init_testing = (sc.read_h5ad('testing/hematopoietic stem cell_testing'))
->>>>>>> 877a02376336a2f5cc8fcb649255651df381d6ba
 
     training_labels = get_severity(init_training)
     testing_labels = get_severity(init_testing)
